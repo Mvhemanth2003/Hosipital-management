@@ -1,0 +1,234 @@
+key componets :
+1. Printing Hospital Data
+2. Printing Patients Data
+3. Sorting Hospitals by Beds Price
+4. Sorting Hospitals by Available Beds
+6. Sorting Hospitals by Rating and Reviews
+7. Print Hospitals in a Specific City
+8. Exit
+
+
+
+
+
+
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Define a structure for Hospital
+struct Hospital {
+    char name[50];
+    char city[50];
+    int beds;
+    float price;
+    float rating;
+    int reviews;
+};
+
+// Define a structure for Patient
+struct Patient {
+    char name[50];
+    int age;
+};
+
+// Function to print hospital data
+void printHospital(struct Hospital hosp) {
+    printf("Hospital Name: %s\n", hosp.name);
+    printf("City: %s\n", hosp.city);
+    printf("Total Beds: %d\n", hosp.beds);
+    printf("Price per Bed: $%.2f\n", hosp.price);
+    printf("Rating: %.1f\n", hosp.rating);
+    printf("Reviews: %d\n", hosp.reviews);
+    printf("\n");
+}
+
+// Comparison functions for sorting
+int compareByPrice(struct Hospital a, struct Hospital b) {
+    return (a.price > b.price) - (a.price < b.price);
+}
+
+int compareByName(struct Hospital a, struct Hospital b) {
+    return strcmp(a.name, b.name);
+}
+
+int compareByRating(struct Hospital a, struct Hospital b) {
+    return (a.rating * a.reviews < b.rating * b.reviews) ? 1 : -1;
+}
+
+int compareByBeds(struct Hospital a, struct Hospital b) {
+    return (a.beds < b.beds) ? 1 : -1;
+}
+
+// Generic sorting function
+void sortHospitals(struct Hospital* hospitals, int n, int (*comparator)(struct Hospital, struct Hospital)) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (comparator(hospitals[j], hospitals[j + 1]) > 0) {
+                struct Hospital temp = hospitals[j];
+                hospitals[j] = hospitals[j + 1];
+                hospitals[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to print hospitals in a specific city (case-insensitive)
+void printHospitalsInCity(struct Hospital* hospitals, int n) {
+    char city[50];
+    int hospitalsFound = 0; // Counter for hospitals found in the city
+
+    printf("Enter city name (X, Y or Z): ");
+    fgets(city, sizeof(city), stdin);
+    city[strcspn(city, "\n")] = 0; // Remove the newline character
+
+    printf("Hospitals in %s:\n", city);
+
+    for (int i = 0; i < n; i++) {
+        if (strcasecmp(hospitals[i].city, city) == 0) {
+            printHospital(hospitals[i]);
+            hospitalsFound++;
+        }
+    }
+
+    if (hospitalsFound == 0) {
+        printf("No hospitals found in %s\n", city);
+    }
+}
+
+// Function to print patient data
+void printPatient(struct Patient patient) {
+    printf("Patient Name: %s\n", patient.name);
+    printf("Age: %d\n", patient.age);
+    printf("\n");
+}
+
+int main() {
+    // Sample hospital data
+    int n = 5; // Number of hospitals
+    struct Hospital* hospitals = malloc(n * sizeof(struct Hospital));
+    if (!hospitals) {
+        printf("Memory allocation failed!\n");
+        return 1;
+    }
+
+    // Initialize hospital data
+    strcpy(hospitals[0].name, "Hospital A");
+    strcpy(hospitals[0].city, "X");
+    hospitals[0].beds = 100;
+    hospitals[0].price = 250.0;
+    hospitals[0].rating = 4.5;
+    hospitals[0].reviews = 100;
+
+    strcpy(hospitals[1].name, "Hospital B");
+    strcpy(hospitals[1].city, "Y");
+    hospitals[1].beds = 150;
+    hospitals[1].price = 200.0;
+    hospitals[1].rating = 4.2;
+    hospitals[1].reviews = 80;
+
+    strcpy(hospitals[2].name, "Hospital C");
+    strcpy(hospitals[2].city, "X");
+    hospitals[2].beds = 200;
+    hospitals[2].price = 180.0;
+    hospitals[2].rating = 4.0;
+    hospitals[2].reviews = 120;
+
+    strcpy(hospitals[3].name, "Hospital D");
+    strcpy(hospitals[3].city, "Z");
+    hospitals[3].beds = 80;
+    hospitals[3].price = 300.0;
+    hospitals[3].rating = 4.8;
+    hospitals[3].reviews = 90;
+
+    strcpy(hospitals[4].name, "Hospital E");
+    strcpy(hospitals[4].city, "Y");
+    hospitals[4].beds = 120;
+    hospitals[4].price = 220.0;
+    hospitals[4].rating = 4.6;
+    hospitals[4].reviews = 110;
+
+    // Sample patient data (associated with hospitals)
+    struct Patient patients[5][3] = {
+        {{"Amar", 35}, {"Manish", 45}, {"Atul", 28}},
+        {{"Elvish", 62}, {"Debolina", 18}, {"Shruti", 55}},
+        {{"Zafar", 50}, {"Rahul", 30}, {"Priya", 40}},
+        {{"Amir", 22}, {"Asif", 38}, {"Prince", 60}},
+        {{"Aditya", 28}, {"Aman", 48}, {"Sahil", 33}}
+    };
+
+    int choice;
+
+    do {
+        printf("\n\n\n*********** Hospital Management System Menu:************\n\n");
+        printf("1. Printing Hospital Data\n");
+        printf("2. Printing Patients Data\n");
+        printf("3. Sorting Hospitals by Beds Price\n");
+        printf("4. Sorting Hospitals by Available Beds\n");
+        printf("5. Sorting Hospitals by Name\n");
+        printf("6. Sorting Hospitals by Rating and Reviews\n");
+        printf("7. Print Hospitals in a Specific City\n");
+        printf("8. Exit\n\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // To consume the newline character after scanf
+
+        switch (choice) {
+            case 1:
+                printf("\nPrinting Hospital Data:\n\n");
+                for (int i = 0; i < n; i++) {
+                    printHospital(hospitals[i]);
+                }
+                break;
+            case 2:
+                printf("Printing Patients Data:\n\n");
+                for (int i = 0; i < n; i++) {
+                    printf("Hospital: %s\n", hospitals[i].name);
+                    for (int j = 0; j < 3; j++) {
+                        printPatient(patients[i][j]);
+                    }
+                }
+                break;
+            case 3:
+                printf("Sorting Hospitals by Beds Price (Ascending):\n");
+                sortHospitals(hospitals, n, compareByPrice);
+                for (int i = 0; i < n; i++) {
+                    printHospital(hospitals[i]);
+                }
+                break;
+            case 4:
+                printf("Sorting Hospitals by Available Beds (Descending):\n");
+                sortHospitals(hospitals, n, compareByBeds);
+                for (int i = 0; i < n; i++) {
+                    printHospital(hospitals[i]);
+                }
+                break;
+            case 5:
+                printf("Sorting Hospitals by Name (Ascending):\n");
+                sortHospitals(hospitals, n, compareByName);
+                for (int i = 0; i < n; i++) {
+                    printHospital(hospitals[i]);
+                }
+                break;
+            case 6:
+                printf("Sorting Hospitals by Rating and Reviews (Descending):\n");
+                sortHospitals(hospitals, n, compareByRating);
+                for (int i = 0; i < n; i++) {
+                    printHospital(hospitals[i]);
+                }
+                break;
+            case 7:
+                printHospitalsInCity(hospitals, n);
+                break;
+            case 8:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+    } while (choice != 8);
+
+    free(hospitals); // Free the allocated memory
+    return 0;
+}
